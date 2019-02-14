@@ -9,6 +9,8 @@ const libraryBPath = path.join(__dirname, "..", "fixtures", "collection", "libra
 // const libraryCPath = path.join(__dirname, "..", "fixtures", "collection", "library.c");
 const libraryDPath = path.join(__dirname, "..", "fixtures", "library.d");
 const cycleDepsBasePath = path.join(__dirname, "..", "fixtures", "cyclic-deps", "node_modules");
+const ui5CopyrightString = "UI development toolkit for HTML5 (OpenUI5)\n * (c) Copyright 2009-xxx SAP SE or an SAP " +
+	"affiliate company.\n * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.";
 
 test("Project with inline configuration", (t) => {
 	const tree = {
@@ -525,9 +527,20 @@ test("Project tree B with inline configs", (t) => {
 	});
 });
 
-test("Project tree Cycle A with inline configs", (t) => {
+test("Project tree Cycle A", (t) => {
 	return projectPreprocessor.processTree(treeApplicationCycleA).then((parsedTree) => {
 		t.deepEqual(parsedTree, expectedTreeApplicationCycleA, "Parsed correctly");
+	});
+});
+
+test("Project tree Cycle F", (t) => {
+	return projectPreprocessor.processTree(treeApplicationCycleF).then((parsedTree) => {
+		t.deepEqual(parsedTree, expectedTreeApplicationCycleF, "Parsed correctly");
+	});
+});
+test("Project tree Cycle F with same versions", (t) => {
+	return projectPreprocessor.processTree(treeApplicationCycleFSameVersions).then((parsedTree) => {
+		t.deepEqual(parsedTree, expectedTreeApplicationCycleFSameVersions, "Parsed correctly");
 	});
 });
 
@@ -1431,6 +1444,537 @@ const expectedTreeApplicationCycleA = {
 		}
 	}
 };
+
+const treeApplicationCycleF = {
+	"id": "application.cycle.f",
+	"version": "1.0.0",
+	"path": path.join(cycleDepsBasePath, "application.cycle.f"),
+	"dependencies": [
+		{
+			"id": "library.cycle.c",
+			"version": "1.0.0",
+			"path": path.join(cycleDepsBasePath, "library.cycle.c"),
+			"dependencies": [
+				{
+					"id": "library.cycle.d",
+					"version": "0.9.0",
+					"path": path.join(cycleDepsBasePath, "library.cycle.d"),
+					"dependencies": [
+						{
+							"id": "library.cycle.e",
+							"version": "1.0.0",
+							"path": path.join(cycleDepsBasePath, "library.cycle.e"),
+							"dependencies": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"id": "library.cycle.d",
+			"version": "1.0.0",
+			"path": path.join(cycleDepsBasePath, "library.cycle.d"),
+			"dependencies": [
+				{
+					"id": "library.cycle.c",
+					"version": "1.0.0",
+					"path": path.join(cycleDepsBasePath, "library.cycle.c"),
+					"dependencies": []
+				},
+				{
+					"id": "library.cycle.e",
+					"version": "1.0.0",
+					"path": path.join(cycleDepsBasePath, "library.cycle.e"),
+					"dependencies": [
+						{
+							"id": "library.cycle.c",
+							"version": "1.0.0",
+							"path": path.join(cycleDepsBasePath, "library.cycle.c"),
+							"dependencies": []
+						}
+					]
+				}
+			]
+		}
+	]
+};
+
+const expectedTreeApplicationCycleF = {
+	"id": "application.cycle.f",
+	"version": "1.0.0",
+	"path": path.join(cycleDepsBasePath, "application.cycle.f"),
+	"dependencies": [
+		{
+			"id": "library.cycle.c",
+			"version": "1.0.0",
+			"path": path.join(cycleDepsBasePath, "library.cycle.c"),
+			"dependencies": [
+				{
+					"id": "library.cycle.d",
+					"version": "1.0.0",
+					"path": path.join(cycleDepsBasePath, "library.cycle.d"),
+					"dependencies": [
+						{
+							"id": "library.cycle.e",
+							"version": "1.0.0",
+							"path": path.join(cycleDepsBasePath, "library.cycle.e"),
+							"dependencies": [],
+							"specVersion": "0.1",
+							"type": "library",
+							"metadata": {
+								"name": "library.cycle.e",
+								"copyright": ui5CopyrightString
+							},
+							"kind": "project",
+							"_level": 3,
+							"resources": {
+								"configuration": {
+									"paths": {
+										"src": "src",
+										"test": "test"
+									}
+								},
+								"pathMappings": {
+									"/resources/": "src",
+									"/test-resources/": "test"
+								}
+							}
+						}
+					],
+					"specVersion": "0.1",
+					"type": "library",
+					"metadata": {
+						"name": "library.cycle.d",
+						"copyright": ui5CopyrightString
+					},
+					"kind": "project",
+					"_level": 2,
+					"resources": {
+						"configuration": {
+							"paths": {
+								"src": "src",
+								"test": "test"
+							}
+						},
+						"pathMappings": {
+							"/resources/": "src",
+							"/test-resources/": "test"
+						}
+					}
+				}
+			],
+			"specVersion": "0.1",
+			"type": "library",
+			"metadata": {
+				"name": "library.cycle.c",
+				"copyright": ui5CopyrightString
+			},
+			"kind": "project",
+			"_level": 1,
+			"resources": {
+				"configuration": {
+					"paths": {
+						"src": "src",
+						"test": "test"
+					}
+				},
+				"pathMappings": {
+					"/resources/": "src",
+					"/test-resources/": "test"
+				}
+			}
+		},
+		{
+			"id": "library.cycle.d",
+			"version": "1.0.0",
+			"path": path.join(cycleDepsBasePath, "library.cycle.d"),
+			"dependencies": [
+				{
+					"id": "library.cycle.c",
+					"version": "1.0.0",
+					"path": path.join(cycleDepsBasePath, "library.cycle.c"),
+					"dependencies": [],
+					"specVersion": "0.1",
+					"type": "library",
+					"metadata": {
+						"name": "library.cycle.c",
+						"copyright": ui5CopyrightString
+					},
+					"kind": "project",
+					"_level": 2,
+					"resources": {
+						"configuration": {
+							"paths": {
+								"src": "src",
+								"test": "test"
+							}
+						},
+						"pathMappings": {
+							"/resources/": "src",
+							"/test-resources/": "test"
+						}
+					}
+				},
+				{
+					"id": "library.cycle.e",
+					"version": "1.0.0",
+					"path": path.join(cycleDepsBasePath, "library.cycle.e"),
+					"dependencies": [
+						{
+							"id": "library.cycle.c",
+							"version": "1.0.0",
+							"path": path.join(cycleDepsBasePath, "library.cycle.c"),
+							"dependencies": [],
+							"specVersion": "0.1",
+							"type": "library",
+							"metadata": {
+								"name": "library.cycle.c",
+								"copyright": ui5CopyrightString
+							},
+							"kind": "project",
+							"_level": 3,
+							"resources": {
+								"configuration": {
+									"paths": {
+										"src": "src",
+										"test": "test"
+									}
+								},
+								"pathMappings": {
+									"/resources/": "src",
+									"/test-resources/": "test"
+								}
+							}
+						}
+					],
+					"specVersion": "0.1",
+					"type": "library",
+					"metadata": {
+						"name": "library.cycle.e",
+						"copyright": ui5CopyrightString
+					},
+					"kind": "project",
+					"_level": 2,
+					"resources": {
+						"configuration": {
+							"paths": {
+								"src": "src",
+								"test": "test"
+							}
+						},
+						"pathMappings": {
+							"/resources/": "src",
+							"/test-resources/": "test"
+						}
+					}
+				}
+			],
+			"specVersion": "0.1",
+			"type": "library",
+			"metadata": {
+				"name": "library.cycle.d",
+				"copyright": ui5CopyrightString
+			},
+			"kind": "project",
+			"_level": 1,
+			"resources": {
+				"configuration": {
+					"paths": {
+						"src": "src",
+						"test": "test"
+					}
+				},
+				"pathMappings": {
+					"/resources/": "src",
+					"/test-resources/": "test"
+				}
+			}
+		}
+	],
+	"_level": 0,
+	"specVersion": "0.1",
+	"type": "application",
+	"metadata": {
+		"name": "application.cycle.f"
+	},
+	"kind": "project",
+	"resources": {
+		"configuration": {
+			"paths": {
+				"webapp": "webapp"
+			}
+		},
+		"pathMappings": {
+			"/": "webapp"
+		}
+	}
+};
+
+const treeApplicationCycleFSameVersions = {
+	"id": "application.cycle.f",
+	"version": "1.0.0",
+	"path": path.join(cycleDepsBasePath, "application.cycle.f"),
+	"dependencies": [
+		{
+			"id": "library.cycle.c",
+			"version": "1.0.0",
+			"path": path.join(cycleDepsBasePath, "library.cycle.c"),
+			"dependencies": [
+				{
+					"id": "library.cycle.d",
+					"version": "1.0.0",
+					"path": path.join(cycleDepsBasePath, "library.cycle.d"),
+					"dependencies": [
+						{
+							"id": "library.cycle.e",
+							"version": "1.0.0",
+							"path": path.join(cycleDepsBasePath, "library.cycle.e"),
+							"dependencies": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"id": "library.cycle.d",
+			"version": "1.0.0",
+			"path": path.join(cycleDepsBasePath, "library.cycle.d"),
+			"dependencies": [
+				{
+					"id": "library.cycle.c",
+					"version": "1.0.0",
+					"path": path.join(cycleDepsBasePath, "library.cycle.c"),
+					"dependencies": []
+				},
+				{
+					"id": "library.cycle.e",
+					"version": "1.0.0",
+					"path": path.join(cycleDepsBasePath, "library.cycle.e"),
+					"dependencies": [
+						{
+							"id": "library.cycle.c",
+							"version": "1.0.0",
+							"path": path.join(cycleDepsBasePath, "library.cycle.c"),
+							"dependencies": []
+						}
+					]
+				}
+			]
+		}
+	]
+};
+
+const expectedTreeApplicationCycleFSameVersions = {
+	"id": "application.cycle.f",
+	"version": "1.0.0",
+	"path": path.join(cycleDepsBasePath, "application.cycle.f"),
+	"dependencies": [
+		{
+			"id": "library.cycle.c",
+			"version": "1.0.0",
+			"path": path.join(cycleDepsBasePath, "library.cycle.c"),
+			"dependencies": [
+				{
+					"id": "library.cycle.d",
+					"version": "1.0.0",
+					"path": path.join(cycleDepsBasePath, "library.cycle.d"),
+					"dependencies": [
+						{
+							"id": "library.cycle.e",
+							"version": "1.0.0",
+							"path": path.join(cycleDepsBasePath, "library.cycle.e"),
+							"dependencies": [],
+							"specVersion": "0.1",
+							"type": "library",
+							"metadata": {
+								"name": "library.cycle.e",
+								"copyright": ui5CopyrightString
+							},
+							"kind": "project",
+							"_level": 3,
+							"resources": {
+								"configuration": {
+									"paths": {
+										"src": "src",
+										"test": "test"
+									}
+								},
+								"pathMappings": {
+									"/resources/": "src",
+									"/test-resources/": "test"
+								}
+							}
+						}
+					],
+					"specVersion": "0.1",
+					"type": "library",
+					"metadata": {
+						"name": "library.cycle.d",
+						"copyright": ui5CopyrightString
+					},
+					"kind": "project",
+					"_level": 2,
+					"resources": {
+						"configuration": {
+							"paths": {
+								"src": "src",
+								"test": "test"
+							}
+						},
+						"pathMappings": {
+							"/resources/": "src",
+							"/test-resources/": "test"
+						}
+					}
+				}
+			],
+			"specVersion": "0.1",
+			"type": "library",
+			"metadata": {
+				"name": "library.cycle.c",
+				"copyright": ui5CopyrightString
+			},
+			"kind": "project",
+			"_level": 1,
+			"resources": {
+				"configuration": {
+					"paths": {
+						"src": "src",
+						"test": "test"
+					}
+				},
+				"pathMappings": {
+					"/resources/": "src",
+					"/test-resources/": "test"
+				}
+			}
+		},
+		{
+			"id": "library.cycle.d",
+			"version": "1.0.0",
+			"path": path.join(cycleDepsBasePath, "library.cycle.d"),
+			"dependencies": [
+				{
+					"id": "library.cycle.c",
+					"version": "1.0.0",
+					"path": path.join(cycleDepsBasePath, "library.cycle.c"),
+					"dependencies": [],
+					"specVersion": "0.1",
+					"type": "library",
+					"metadata": {
+						"name": "library.cycle.c",
+						"copyright": ui5CopyrightString
+					},
+					"kind": "project",
+					"_level": 2,
+					"resources": {
+						"configuration": {
+							"paths": {
+								"src": "src",
+								"test": "test"
+							}
+						},
+						"pathMappings": {
+							"/resources/": "src",
+							"/test-resources/": "test"
+						}
+					}
+				},
+				{
+					"id": "library.cycle.e",
+					"version": "1.0.0",
+					"path": path.join(cycleDepsBasePath, "library.cycle.e"),
+					"dependencies": [
+						{
+							"id": "library.cycle.c",
+							"version": "1.0.0",
+							"path": path.join(cycleDepsBasePath, "library.cycle.c"),
+							"dependencies": [],
+							"specVersion": "0.1",
+							"type": "library",
+							"metadata": {
+								"name": "library.cycle.c",
+								"copyright": ui5CopyrightString
+							},
+							"kind": "project",
+							"_level": 3,
+							"resources": {
+								"configuration": {
+									"paths": {
+										"src": "src",
+										"test": "test"
+									}
+								},
+								"pathMappings": {
+									"/resources/": "src",
+									"/test-resources/": "test"
+								}
+							}
+						}
+					],
+					"specVersion": "0.1",
+					"type": "library",
+					"metadata": {
+						"name": "library.cycle.e",
+						"copyright": ui5CopyrightString
+					},
+					"kind": "project",
+					"_level": 2,
+					"resources": {
+						"configuration": {
+							"paths": {
+								"src": "src",
+								"test": "test"
+							}
+						},
+						"pathMappings": {
+							"/resources/": "src",
+							"/test-resources/": "test"
+						}
+					}
+				}
+			],
+			"specVersion": "0.1",
+			"type": "library",
+			"metadata": {
+				"name": "library.cycle.d",
+				"copyright": ui5CopyrightString
+			},
+			"kind": "project",
+			"_level": 1,
+			"resources": {
+				"configuration": {
+					"paths": {
+						"src": "src",
+						"test": "test"
+					}
+				},
+				"pathMappings": {
+					"/resources/": "src",
+					"/test-resources/": "test"
+				}
+			}
+		}
+	],
+	"_level": 0,
+	"specVersion": "0.1",
+	"type": "application",
+	"metadata": {
+		"name": "application.cycle.f"
+	},
+	"kind": "project",
+	"resources": {
+		"configuration": {
+			"paths": {
+				"webapp": "webapp"
+			}
+		},
+		"pathMappings": {
+			"/": "webapp"
+		}
+	}
+};
+
 
 /* ======= /Test data ======= */
 /* ========================= */
