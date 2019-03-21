@@ -81,6 +81,19 @@ Some general information:
           It is recommended that modules include their namespace in the virtual path and use the `/resources` prefix (e.g. `/resources/my/first/library/module-xy`).
 
 #### builder (optional)
+- `bundles` (optional, list): In this block you describe your desired custom bundles with a list of so called 'bundle definitions'.
+  - `bundleDefinition` A bundle definition contains of the following options:
+    - `name` The bundle name
+    - `defaultFileTypes` List of default file types which should be included in the bundle
+    - `sections` A list of sections. Each section specifies an embedding technology and lists the resources that should be in- or excluded from the section
+      - `mode`  the embedding technology (e.g. provided, raw, preload)
+      - `filters` List of resources that should be in- or excluded
+      - `resolve` Setting resolve to 'true' will also include all (transitive) dependencies of the files
+      - `sort`  By default, modules are sorted by their dependencies. The sorting can be suppressed by setting the option to 'false'
+    - `bundleOptions`
+      - `optimize` By default set to 'false'. If set to 'true', the bundle resources get minimized
+      - `usePredefineCalls`  By default set to 'false'. If set to 'true', sap.ui.predefine is used for amd compliant modules
+      - `decorateBootstrapModule` ? 
 - `customTasks` (optional, list): In this block, you define additional custom build tasks, see [here](./BuildExtensibility.md) for a detailed explanation and examples of the build extensibility. Each entry in the `customTasks` list consists of the following options:
   - `name` (mandatory): The name of the custom task
   - `afterTask` or `beforeTask` (only one, mandatory): The name of the build task after or before which your custom task will be executed.
