@@ -55,6 +55,8 @@ builder:
   jsdoc:
     excludes:
       - some/project/name/thirdparty/**
+  cachebuster:
+    signatureType: hash
 server:
   settings:
     port: 8099
